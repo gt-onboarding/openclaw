@@ -1,0 +1,121 @@
+---
+title: Auf Railway bereitstellen
+---
+
+Stelle OpenClaw mit einer One-Click-Vorlage auf Railway bereit und schließe die Einrichtung in deinem Browser ab.
+Das ist der einfachste Weg „ohne Terminal auf dem Server“: Railway betreibt das Gateway für dich
+und du konfigurierst alles über den `/setup`-Webassistenten.
+
+<div id="quick-checklist-new-users">
+  ## Kurze Checkliste (neue Nutzer:innen)
+</div>
+
+1) Klicke auf **Deploy on Railway** (unten).
+2) Füge ein **Volume** hinzu, das unter `/data` eingebunden ist.
+3) Setze die erforderlichen **Variables** (mindestens `SETUP_PASSWORD`).
+4) Aktiviere den **HTTP-Proxy** auf Port `8080`.
+5) Öffne `https://<your-railway-domain>/setup` und schließe den Einrichtungsassistenten ab.
+
+<div id="one-click-deploy">
+  ## One-Click-Deployment
+</div>
+
+<a href="https://railway.com/deploy/clawdbot-railway-template" target="_blank" rel="noreferrer">Auf Railway bereitstellen</a>
+
+Nach dem Deployment findest du deine öffentliche URL unter **Railway → your service → Settings → Domains**.
+
+Railway macht dann entweder Folgendes:
+
+- weist dir eine generierte Domain zu (oft `https://<something>.up.railway.app`), oder
+- verwendet deine eigene Domain, falls du eine hinterlegt hast.
+
+Öffne dann:
+
+- `https://<your-railway-domain>/setup` — Einrichtungsassistent (passwortgeschützt)
+- `https://<your-railway-domain>/openclaw` — Control UI
+
+<div id="what-you-get">
+  ## Was du bekommst
+</div>
+
+- Gehosteter OpenClaw Gateway + Control UI
+- Webbasierter Einrichtungsassistent unter `/setup` (keine Terminalbefehle nötig)
+- Persistenter Speicher über ein Railway Volume (`/data`), damit Konfiguration/Anmeldedaten/arbeitsbereich auch erneute Deployments überstehen
+- Backup-Export unter `/setup/export`, um später von Railway weg migrieren zu können
+
+<div id="required-railway-settings">
+  ## Erforderliche Einstellungen in Railway
+</div>
+
+<div id="public-networking">
+  ### Öffentliches Netzwerk
+</div>
+
+Aktivieren Sie **HTTP-Proxy** für den Dienst.
+
+- Port: `8080`
+
+<div id="volume-required">
+  ### Volume (erforderlich)
+</div>
+
+Binde ein Volume ein, das unter folgendem Pfad eingehängt ist:
+
+- `/data`
+
+<div id="variables">
+  ### Variablen
+</div>
+
+Setze diese Variablen für den Dienst:
+
+- `SETUP_PASSWORD` (erforderlich)
+- `PORT=8080` (erforderlich — muss mit dem Port im Public Networking übereinstimmen)
+- `OPENCLAW_STATE_DIR=/data/.openclaw` (empfohlen)
+- `OPENCLAW_WORKSPACE_DIR=/data/workspace` (empfohlen)
+- `OPENCLAW_GATEWAY_TOKEN` (empfohlen; wie ein Admin-Secret behandeln)
+
+<div id="setup-flow">
+  ## Einrichtungsablauf
+</div>
+
+1) Rufe `https://<your-railway-domain>/setup` auf und gib dein `SETUP_PASSWORD` ein.
+2) Wähle einen Modell-/Auth-Anbieter und füge deinen API-Schlüssel ein.
+3) (Optional) Füge Telegram-/Discord-/Slack-Tokens hinzu.
+4) Klicke auf **Run setup**.
+
+Wenn Telegram-DMs auf kopplung eingestellt sind, kann der Einrichtungsassistent den Kopplungscode bestätigen.
+
+<div id="getting-chat-tokens">
+  ## Chat-Tokens erhalten
+</div>
+
+<div id="telegram-bot-token">
+  ### Telegram-Bot-Token
+</div>
+
+1) Sende in Telegram eine Nachricht an `@BotFather`
+2) Führe `/newbot` aus
+3) Kopiere das Token (sieht aus wie `123456789:AA...`)
+4) Füge es in `/setup` ein
+
+<div id="discord-bot-token">
+  ### Discord-Bot-Token
+</div>
+
+1) Rufe https://discord.com/developers/applications auf
+2) **New Application** → wähle einen Namen
+3) **Bot** → **Add Bot**
+4) Aktiviere **MESSAGE CONTENT INTENT** unter Bot → Privileged Gateway Intents (erforderlich, sonst stürzt der Bot beim Start ab)
+5) Kopiere den **Bot-Token** und füge ihn in `/setup` ein
+6) Lade den Bot auf deinen Server ein (OAuth2 URL Generator; Scopes: `bot`, `applications.commands`)
+
+<div id="backups-migration">
+  ## Backups & Migration
+</div>
+
+Lade ein Backup herunter von:
+
+- `https://<your-railway-domain>/setup/export`
+
+Dies exportiert deinen OpenClaw-Zustand und deinen Arbeitsbereich, sodass du auf einen anderen Host migrieren kannst, ohne Konfiguration oder Speicher zu verlieren.

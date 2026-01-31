@@ -1,0 +1,196 @@
+---
+title: 在 Render 上部署
+---
+
+使用基础设施即代码（Infrastructure as Code）在 Render 上部署 OpenClaw。随附的 `render.yaml` Blueprint 模板以声明式方式定义了你的完整技术栈（服务、磁盘、环境变量等），因此你可以一键部署，并将基础设施与代码一同进行版本管理。
+
+<div id="prerequisites">
+  ## 前提条件
+</div>
+
+* 一个 [Render 账号](https://render.com)（提供免费层级）
+* 来自你偏好[模型提供方](/zh/providers)的 API 密钥
+
+<div id="deploy-with-a-render-blueprint">
+  ## 使用 Render Blueprint 部署
+</div>
+
+<a href="https://render.com/deploy?repo=https://github.com/openclaw/openclaw" target="_blank" rel="noreferrer">部署到 Render</a>
+
+点击该链接后将会：
+
+1. 基于此仓库根目录下的 `render.yaml` Blueprint 创建一个新的 Render 服务。
+2. 提示你设置 `SETUP_PASSWORD`。
+3. 构建 Docker 镜像并完成部署。
+
+部署完成后，你的服务 URL 将采用如下模式：`https://<service-name>.onrender.com`。
+
+<div id="understanding-the-blueprint">
+  ## 理解 Blueprint
+</div>
+
+Render Blueprint 是用于定义你基础设施的 YAML 文件。本仓库中的 `render.yaml` 文件配置了运行 OpenClaw 所需的全部内容：
+
+```yaml
+services:
+  - type: web
+    name: openclaw
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: SETUP_PASSWORD
+        sync: false          # prompts during deploy
+      - key: OPENCLAW_STATE_DIR
+        value: /data/.openclaw
+      - key: OPENCLAW_WORKSPACE_DIR
+        value: /data/workspace
+      - key: OPENCLAW_GATEWAY_TOKEN
+        generateValue: true  # 自动生成安全令牌
+    disk:
+      name: openclaw-data
+      mountPath: /data
+      sizeGB: 1
+```
+
+Blueprint 使用的关键特性：
+
+| Feature               | Purpose                         |
+| --------------------- | ------------------------------- |
+| `runtime: docker`     | 从代码仓库中的 Dockerfile 构建           |
+| `healthCheckPath`     | Render 会监控 `/health` 并重启状态异常的实例 |
+| `sync: false`         | 在部署期间提示输入值（用于机密信息）              |
+| `generateValue: true` | 自动生成符合密码学安全要求的值                 |
+| `disk`                | 在重新部署后仍然保留数据的持久化存储              |
+
+<div id="choosing-a-plan">
+  ## 选择方案
+</div>
+
+| 方案 | 自动停机 | 磁盘 | 适用场景 |
+|------|-----------|------|----------|
+| Free | 空闲 15 分钟后 | 不可用 | 测试、演示 |
+| Starter | 从不 | 1GB+ | 个人使用、小团队 |
+| Standard+ | 从不 | 1GB+ | 生产环境、多渠道 |
+
+Blueprint 默认使用 `starter`。如需使用免费层，在你 fork 的 `render.yaml` 中将 `plan: starter` 改为 `plan: free`（但注意：没有持久磁盘意味着每次部署都会重置配置）。
+
+<div id="after-deployment">
+  ## 部署完成后
+</div>
+
+<div id="complete-the-setup-wizard">
+  ### 完成设置向导
+</div>
+
+1. 访问 `https://<your-service>.onrender.com/setup`
+2. 输入你的 `SETUP_PASSWORD`
+3. 选择一个模型提供方，并粘贴你的 API 密钥
+4. （可选）配置消息通道（Telegram、Discord、Slack）
+5. 点击 **Run setup**
+
+<div id="access-the-control-ui">
+  ### 访问 Control UI
+</div>
+
+Web 控制台位于 `https://<your-service>.onrender.com/openclaw`。
+
+<div id="render-dashboard-features">
+  ## Render 仪表板功能
+</div>
+
+<div id="logs">
+  ### 日志
+</div>
+
+在 **Dashboard → your service → Logs** 中查看实时日志。可以按以下类型进行筛选：
+
+* 构建日志（Docker 镜像创建）
+* 部署日志（服务启动）
+* 运行时日志（应用程序输出）
+
+<div id="shell-access">
+  ### Shell 访问
+</div>
+
+用于调试时，可通过 **Dashboard → your service → Shell** 打开一个 shell 会话。持久磁盘挂载在 `/data`。
+
+<div id="environment-variables">
+  ### 环境变量
+</div>
+
+在 **Dashboard → Your service → Environment** 中修改环境变量。更改会触发自动重新部署。
+
+<div id="auto-deploy">
+  ### 自动部署
+</div>
+
+如果你使用的是原始的 OpenClaw 仓库，Render 不会自动重新部署你的 OpenClaw。若要更新，请在 Render 仪表盘中手动运行一次 Blueprint 同步。
+
+<div id="custom-domain">
+  ## 自定义域名
+</div>
+
+1. 进入 **Dashboard → 你的服务 → Settings → Custom Domains**
+2. 添加你的域名
+3. 按提示配置 DNS（将 CNAME 指向 `*.onrender.com`）
+4. Render 会自动签发 TLS 证书
+
+<div id="scaling">
+  ## 扩容
+</div>
+
+Render 支持横向和纵向扩容：
+
+* **纵向**：通过更换方案以获得更多 CPU/RAM 资源
+* **横向**：增加实例数量（标准方案及以上）
+
+对于 OpenClaw，一般纵向扩容就足够了。横向扩容则需要启用会话粘滞（sticky sessions）或采用外部状态管理。
+
+<div id="backups-and-migration">
+  ## 备份与迁移
+</div>
+
+可随时导出配置和工作区：
+
+```
+https://<your-service>.onrender.com/setup/export
+```
+
+这会下载一个可移植的备份，你可以在任何 OpenClaw 主机上恢复。
+
+<div id="troubleshooting">
+  ## 故障排除
+</div>
+
+<div id="service-wont-start">
+  ### 服务无法启动
+</div>
+
+在 Render Dashboard 中检查部署日志。常见问题包括：
+
+* 缺少 `SETUP_PASSWORD` —— Blueprint 会提示你设置它，但请再次确认已设置
+* 端口不匹配 —— 确保 `PORT=8080` 与 Dockerfile 中暴露的端口一致
+
+<div id="slow-cold-starts-free-tier">
+  ### 冷启动缓慢（免费版）
+</div>
+
+免费版服务在空闲 15 分钟后会自动停机。停机后的首次请求在容器启动时会需要几秒钟。升级到 Starter 计划即可获得始终在线。
+
+<div id="data-loss-after-redeploy">
+  ### 重新部署后数据丢失
+</div>
+
+这种情况会发生在免费套餐（无持久磁盘）中。请升级到付费套餐，或定期通过 `/setup/export` 导出你的配置。
+
+<div id="health-check-failures">
+  ### 健康检查失败
+</div>
+
+Render 要求在 30 秒内从 `/health` 接口收到 200 响应。如果构建成功但部署失败，可能是服务启动时间过长。请检查：
+
+* 构建日志中是否有错误
+* 容器在本地使用 `docker build && docker run` 运行时是否能正常启动

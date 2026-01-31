@@ -1,0 +1,121 @@
+---
+title: Railway へのデプロイ
+---
+
+ワンクリックテンプレートを使って Railway 上に OpenClaw をデプロイし、ブラウザ上でセットアップを完了します。
+これは「サーバー側でターミナルを触る必要がない」最も簡単な方法です。Railway が Gateway を実行し、
+あなたは `/setup` Web ウィザードからすべての設定を行えます。
+
+<div id="quick-checklist-new-users">
+  ## クイックチェックリスト（新規ユーザー向け）
+</div>
+
+1) 下の **Deploy on Railway** をクリックします。
+2) `/data` にマウントする **Volume** を追加します。
+3) 必須の **Variables**（少なくとも `SETUP_PASSWORD`）を設定します。
+4) ポート `8080` で **HTTP Proxy** を有効化します。
+5) `https://<your-railway-domain>/setup` にアクセスし、セットアップウィザードを完了します。
+
+<div id="one-click-deploy">
+  ## ワンクリックデプロイ
+</div>
+
+<a href="https://railway.com/deploy/clawdbot-railway-template" target="_blank" rel="noreferrer">Railway でデプロイ</a>
+
+デプロイ後、公開 URL は **Railway → your service → Settings → Domains** で確認できます。
+
+Railway は次のいずれかになります:
+
+- 自動生成されたドメインを割り当てます（多くの場合は `https://<something>.up.railway.app`）、または
+- あらかじめ紐付けたカスタムドメインを使用します。
+
+その後、次を開きます:
+
+- `https://<your-railway-domain>/setup` — セットアップウィザード（パスワードで保護）
+- `https://<your-railway-domain>/openclaw` — Control UI
+
+<div id="what-you-get">
+  ## 含まれるもの
+</div>
+
+- ホストされた OpenClaw Gateway + Control UI
+- `/setup` での Web セットアップウィザード（ターミナルでのコマンド入力は不要）
+- Railway Volume（`/data`）による永続ストレージにより、config/credentials/ワークスペースが再デプロイ後も保持される
+- 後で Railway 以外の環境へ移行するための、`/setup/export` でのバックアップエクスポート機能
+
+<div id="required-railway-settings">
+  ## Railway で必須の設定
+</div>
+
+<div id="public-networking">
+  ### パブリックネットワーク
+</div>
+
+サービスで **HTTP Proxy** を有効化します。
+
+- ポート: `8080`
+
+<div id="volume-required">
+  ### ボリューム（必須）
+</div>
+
+次のパスにマウントされたボリュームをアタッチする必要があります:
+
+- `/data`
+
+<div id="variables">
+  ### 変数
+</div>
+
+サービスで次の変数を設定します:
+
+- `SETUP_PASSWORD` (必須)
+- `PORT=8080` (必須 — Public Networking で指定したポートと一致している必要があります)
+- `OPENCLAW_STATE_DIR=/data/.openclaw` (推奨)
+- `OPENCLAW_WORKSPACE_DIR=/data/workspace` (推奨)
+- `OPENCLAW_GATEWAY_TOKEN` (推奨; 管理用シークレットとして扱ってください)
+
+<div id="setup-flow">
+  ## セットアップの流れ
+</div>
+
+1) `https://<your-railway-domain>/setup` にアクセスし、`SETUP_PASSWORD` を入力します。
+2) モデル／認証プロバイダーを選択し、キーを貼り付けます。
+3) （任意）Telegram／Discord／Slack のトークンを追加します。
+4) **Run setup** をクリックします。
+
+Telegram の DM がペアリングモードになっている場合は、セットアップウィザードからペアリングコードを承認できます。
+
+<div id="getting-chat-tokens">
+  ## チャットトークンの取得
+</div>
+
+<div id="telegram-bot-token">
+  ### Telegram ボットトークン
+</div>
+
+1) Telegram で `@BotFather` にメッセージを送信する
+2) `/newbot` コマンドを実行する
+3) トークン（`123456789:AA...` のような形式）をコピーする
+4) `/setup` に貼り付ける
+
+<div id="discord-bot-token">
+  ### Discord ボットトークン
+</div>
+
+1) https://discord.com/developers/applications にアクセスする
+2) **New Application** → 名前を入力する
+3) **Bot** → **Add Bot** を選択
+4) Bot → Privileged Gateway Intents 内の **MESSAGE CONTENT INTENT** を有効化する（必須。無効のままだとボットは起動時にクラッシュする）
+5) **Bot Token** をコピーして `/setup` に貼り付ける
+6) ボットを自分のサーバーに招待する（OAuth2 URL Generator を使用し、scope に `bot` と `applications.commands` を指定する）
+
+<div id="backups-migration">
+  ## バックアップと移行
+</div>
+
+バックアップは以下からダウンロードできます:
+
+- `https://<your-railway-domain>/setup/export`
+
+これにより、OpenClaw の状態とワークスペースがエクスポートされるため、設定やメモリを失うことなく別のホストに移行できます。

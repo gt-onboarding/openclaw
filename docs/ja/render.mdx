@@ -1,0 +1,198 @@
+---
+title: Render へのデプロイ
+---
+
+Infrastructure as Code を用いて Render 上に OpenClaw をデプロイします。付属の `render.yaml` Blueprint は、サービス、ディスク、環境変数などを含むスタック全体を宣言的に定義しているため、ワンクリックでデプロイでき、インフラをコードと並行してバージョン管理できます。
+
+<div id="prerequisites">
+  ## 前提条件
+</div>
+
+* [Render アカウント](https://render.com)（無料プランあり）
+* 任意の [モデルプロバイダー](/ja/providers) の API キー
+
+<div id="deploy-with-a-render-blueprint">
+  ## Render Blueprint でデプロイする
+</div>
+
+<a href="https://render.com/deploy?repo=https://github.com/openclaw/openclaw" target="_blank" rel="noreferrer">Render にデプロイ</a>
+
+このリンクをクリックすると、次の処理が行われます：
+
+1. このリポジトリのルートにある `render.yaml` Blueprint から新しい Render サービスが作成されます。
+2. `SETUP_PASSWORD` を設定するよう求められます
+3. Docker イメージがビルドされ、デプロイされます
+
+デプロイが完了すると、サービスの URL は `https://<service-name>.onrender.com` というパターンになります。
+
+<div id="understanding-the-blueprint">
+  ## Blueprint を理解する
+</div>
+
+Render Blueprint は、インフラストラクチャを定義する YAML ファイルです。このリポジトリに含まれる `render.yaml` では、
+OpenClaw を実行するために必要なすべてが構成されています。
+
+```yaml
+services:
+  - type: web
+    name: openclaw
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: SETUP_PASSWORD
+        sync: false          # デプロイ時に入力を要求
+      - key: OPENCLAW_STATE_DIR
+        value: /data/.openclaw
+      - key: OPENCLAW_WORKSPACE_DIR
+        value: /data/workspace
+      - key: OPENCLAW_GATEWAY_TOKEN
+        generateValue: true  # セキュアなトークンを自動生成
+    disk:
+      name: openclaw-data
+      mountPath: /data
+      sizeGB: 1
+```
+
+使用されている Blueprint の主な機能:
+
+| 機能                    | 目的                                             |
+| --------------------- | ---------------------------------------------- |
+| `runtime: docker`     | リポジトリの Dockerfile からビルドする                      |
+| `healthCheckPath`     | Render が `/health` エンドポイントを監視し、異常なインスタンスを再起動する |
+| `sync: false`         | デプロイ時に値（シークレット）を対話的に入力させる                      |
+| `generateValue: true` | 暗号学的に安全な値を自動生成する                               |
+| `disk`                | 再デプロイ後も保持される永続ストレージ                            |
+
+<div id="choosing-a-plan">
+  ## プランの選択
+</div>
+
+| Plan | スピンダウン | ディスク | 推奨ユースケース |
+|------|-----------|------|----------|
+| Free | 15分間アイドル状態後 | 利用不可 | テスト、デモ |
+| Starter | なし | 1GB以上 | 個人利用、小規模チーム |
+| Standard+ | なし | 1GB以上 | 本番環境、複数チャネル |
+
+この Blueprint のデフォルトプランは `starter` です。Free プランを使用するには、フォークしたリポジトリの
+`render.yaml` で `plan: free` に変更してください（ただし、永続ディスクがないため、デプロイのたびに設定がリセットされる点に注意してください）。
+
+<div id="after-deployment">
+  ## デプロイ後に行うこと
+</div>
+
+<div id="complete-the-setup-wizard">
+  ### セットアップウィザードを完了する
+</div>
+
+1. `https://<your-service>.onrender.com/setup` にアクセスします
+2. `SETUP_PASSWORD` を入力します
+3. モデルプロバイダーを選択し、APIキーを貼り付けます
+4. 必要に応じてメッセージングチャンネル（Telegram、Discord、Slack）を設定します
+5. **Run setup** をクリックします
+
+<div id="access-the-control-ui">
+  ### Control UI へアクセスする
+</div>
+
+Web ダッシュボードには `https://<your-service>.onrender.com/openclaw` からアクセスできます。
+
+<div id="render-dashboard-features">
+  ## Render ダッシュボードの機能
+</div>
+
+<div id="logs">
+  ### ログ
+</div>
+
+**Dashboard → 対象サービス → Logs** でリアルタイムのログを確認できます。次の種類でフィルタリングできます：
+
+* ビルドログ（Docker イメージ作成）
+* デプロイログ（サービス起動）
+* ランタイムログ（アプリケーション出力）
+
+<div id="shell-access">
+  ### シェルアクセス
+</div>
+
+デバッグ時は、**Dashboard → your service → Shell** からシェル セッションを開いてください。永続ディスクは `/data` にマウントされています。
+
+<div id="environment-variables">
+  ### 環境変数
+</div>
+
+**Dashboard → 対象サービス → Environment** で変数を変更します。変更すると自動的に再デプロイが行われます。
+
+<div id="auto-deploy">
+  ### 自動デプロイ
+</div>
+
+オリジナルの OpenClaw リポジトリを使用している場合、Render では OpenClaw は自動デプロイされません。更新するには、ダッシュボードから Blueprint の同期を手動で実行する必要があります。
+
+<div id="custom-domain">
+  ## カスタムドメイン
+</div>
+
+1. **Dashboard → 対象サービス → Settings → Custom Domains** を開きます
+2. 独自ドメインを追加します
+3. 指示に従って DNS を設定します（`*.onrender.com` への CNAME を作成）
+4. Render が自動的に TLS 証明書を発行します
+
+<div id="scaling">
+  ## スケーリング
+</div>
+
+Render は垂直スケーリングと水平スケーリングの両方をサポートしています:
+
+* **垂直**: プランを変更して、より多くの CPU/RAM を割り当てる
+* **水平**: インスタンス数を増やす（Standard プラン以上）
+
+OpenClaw では、通常は垂直スケーリングで十分です。水平スケーリングを行う場合は、スティッキーセッションまたは外部の状態管理が必要です。
+
+<div id="backups-and-migration">
+  ## バックアップと移行
+</div>
+
+設定とワークスペースはいつでもエクスポートできます：
+
+```
+https://<your-service>.onrender.com/setup/export
+```
+
+これで、どの OpenClaw ホストでも復元可能なポータブルバックアップがダウンロードされます。
+
+<div id="troubleshooting">
+  ## トラブルシューティング
+</div>
+
+<div id="service-wont-start">
+  ### サービスが起動しない
+</div>
+
+Render Dashboard でデプロイログを確認します。よくある原因:
+
+* `SETUP_PASSWORD` が設定されていない — Blueprint で入力を求められますが、正しく設定されているか確認してください
+* ポートの不一致 — `PORT=8080` が Dockerfile で公開しているポートと一致していることを確認してください
+
+<div id="slow-cold-starts-free-tier">
+  ### コールドスタートが遅い（無料プラン）
+</div>
+
+無料プランのサービスは、15分間リクエストがないとスピンダウンします。スピンダウン後の最初のリクエストは、コンテナの起動に数秒ほど時間がかかります。常時起動させるには Starter プランにアップグレードしてください。
+
+<div id="data-loss-after-redeploy">
+  ### 再デプロイ後のデータ消失
+</div>
+
+これは永続ディスクがない無料プランで発生します。有料プランにアップグレードするか、`/setup/export` を使って定期的に設定をエクスポートしてください。
+
+<div id="health-check-failures">
+  ### ヘルスチェックの失敗
+</div>
+
+Render では `/health` に対して 30 秒以内に 200 レスポンスが返ってくることを想定しています。ビルドは成功しているのにデプロイが失敗する場合、サービスの起動に時間がかかりすぎている可能性があります。次を確認してください。
+
+* ビルドログにエラーがないか
+* コンテナがローカルで `docker build && docker run` で正常に動作するかどうか

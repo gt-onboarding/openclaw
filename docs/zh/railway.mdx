@@ -1,0 +1,121 @@
+---
+title: 在 Railway 上部署
+---
+
+使用一键模板在 Railway 上部署 OpenClaw，并在浏览器中完成设置。
+这是最省事的“在服务器上不需要使用终端”的方案：Railway 会替你运行 Gateway，
+你只需要通过 `/setup` 网页向导完成全部配置。
+
+<div id="quick-checklist-new-users">
+  ## 快速核对清单（新用户）
+</div>
+
+1) 点击下方的 **Deploy on Railway**。
+2) 添加一个挂载到 `/data` 的 **Volume**。
+3) 设置必填的 **Variables**（至少包括 `SETUP_PASSWORD`）。
+4) 在端口 `8080` 上启用 **HTTP Proxy**。
+5) 打开 `https://<your-railway-domain>/setup` 并完成安装向导。
+
+<div id="one-click-deploy">
+  ## 一键部署
+</div>
+
+<a href="https://railway.com/deploy/clawdbot-railway-template" target="_blank" rel="noreferrer">在 Railway 上部署</a>
+
+部署完成后，在 **Railway → your service → Settings → Domains** 中找到你的公共访问 URL。
+
+Railway 会：
+
+- 为你生成一个域名（通常是 `https://<something>.up.railway.app`），或
+- 使用你绑定的自定义域名（如果已绑定）。
+
+然后打开：
+
+- `https://<your-railway-domain>/setup` — 安装向导（受密码保护）
+- `https://<your-railway-domain>/openclaw` — Control UI 管理界面
+
+<div id="what-you-get">
+  ## 你将获得的内容
+</div>
+
+- 托管版 OpenClaw Gateway + Control UI
+- 位于 `/setup` 的 Web 安装向导（无需在终端中运行命令）
+- 通过 Railway Volume（`/data`）提供持久化存储，因此配置/凭证/工作区在重新部署后仍然保留
+- 通过 `/setup/export` 导出备份，以便之后从 Railway 迁移出去
+
+<div id="required-railway-settings">
+  ## Railway 必要设置
+</div>
+
+<div id="public-networking">
+  ### 公网访问
+</div>
+
+为该服务启用 **HTTP Proxy**。
+
+- 端口：`8080`
+
+<div id="volume-required">
+  ### 卷（必需）
+</div>
+
+将一个卷挂载到：
+
+- `/data`
+
+<div id="variables">
+  ### 变量
+</div>
+
+在该服务中设置以下变量：
+
+- `SETUP_PASSWORD`（必填）
+- `PORT=8080`（必填——必须与 Public Networking 中的端口一致）
+- `OPENCLAW_STATE_DIR=/data/.openclaw`（推荐）
+- `OPENCLAW_WORKSPACE_DIR=/data/workspace`（推荐）
+- `OPENCLAW_GATEWAY_TOKEN`（推荐；按管理员级机密对待）
+
+<div id="setup-flow">
+  ## 设置流程
+</div>
+
+1) 访问 `https://<your-railway-domain>/setup` 并输入你的 `SETUP_PASSWORD`。
+2) 选择一个模型/身份验证提供方并粘贴你的密钥。
+3) （可选）添加 Telegram/Discord/Slack 令牌。
+4) 点击 **运行设置**。
+
+如果 Telegram 私信设置为配对模式，设置向导可以批准该配对码。
+
+<div id="getting-chat-tokens">
+  ## 获取聊天 Token
+</div>
+
+<div id="telegram-bot-token">
+  ### Telegram 机器人令牌
+</div>
+
+1) 在 Telegram 中向 `@BotFather` 发送消息
+2) 使用 `/newbot` 命令
+3) 复制令牌（类似于 `123456789:AA...`）
+4) 将其粘贴到 `/setup` 中
+
+<div id="discord-bot-token">
+  ### Discord 机器人令牌
+</div>
+
+1) 访问 https://discord.com/developers/applications
+2) 点击 **New Application** → 选择一个名称
+3) 点击 **Bot** → **Add Bot**
+4) 在 Bot → Privileged Gateway Intents 下启用 **MESSAGE CONTENT INTENT**（必需，否则机器人会在启动时崩溃）
+5) 复制 **Bot Token** 并粘贴到 `/setup` 中
+6) 将机器人邀请到你的服务器（在 OAuth2 URL Generator 中设置 scopes：`bot`、`applications.commands`）
+
+<div id="backups-migration">
+  ## 备份与迁移
+</div>
+
+在如下地址下载备份：
+
+- `https://<your-railway-domain>/setup/export`
+
+这会导出你的 OpenClaw 状态和工作区，以便你在迁移到其他主机时不会丢失配置或记忆。
