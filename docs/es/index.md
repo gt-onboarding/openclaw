@@ -1,15 +1,15 @@
 ---
-title: Index
-summary: "Top-level overview of OpenClaw, features, and purpose"
+title: Índice
+summary: "Visión general de alto nivel de OpenClaw, sus funciones y su propósito"
 read_when:
-  - Introducing OpenClaw to newcomers
+  - Introducir OpenClaw a personas que se inician en la plataforma
 ---
 
 <div id="openclaw">
   # OpenClaw 🦞
 </div>
 
-> *&quot;EXFOLIATE! EXFOLIATE!&quot;* — A space lobster, probably
+> *&quot;¡EXFÓLIATE! ¡EXFÓLIATE!&quot;* — Una langosta espacial, probablemente
 
 <p align="center">
   <picture>
@@ -20,24 +20,20 @@ read_when:
 </p>
 
 <p align="center">
-  <strong>
-    Any OS + WhatsApp/Telegram/Discord/iMessage gateway for AI agents (Pi).
-  </strong>
-
-  <br />
-
-  Plugins add Mattermost and more. Send a message, get an agent response — from
-  your pocket.
+  <strong>Gateway de IA para agentes (como Pi) en cualquier sistema operativo, con soporte para WhatsApp/Telegram/Discord/iMessage.</strong><br />
+  Los complementos añaden Mattermost y más.
+  Envía un mensaje, recibe la respuesta de un agente — desde tu bolsillo.
 </p>
 
 <p align="center">
   <a href="https://github.com/openclaw/openclaw">GitHub</a> ·
   <a href="https://github.com/openclaw/openclaw/releases">Releases</a> ·
-  <a href="/es/">Docs</a> ·<a href="/es/start/openclaw">OpenClaw assistant setup</a>
+  <a href="/es/">Documentación</a> ·
+  <a href="/es/start/openclaw">Configuración del asistente OpenClaw</a>
 </p>
 
-OpenClaw conecta WhatsApp (vía WhatsApp Web / Baileys), Telegram (Bot API / grammY), Discord (Bot API / channels.discord.js) e iMessage (imsg CLI) con agentes de código como [Pi](https://github.com/badlogic/pi-mono). Los complementos añaden Mattermost (Bot API + WebSocket) y más.
-OpenClaw también impulsa el asistente OpenClaw.
+OpenClaw conecta WhatsApp (a través de WhatsApp Web / Baileys), Telegram (Bot API / grammY), Discord (Bot API / channels.discord.js) e iMessage (imsg CLI) con agentes de programación como [Pi](https://github.com/badlogic/pi-mono). Los complementos añaden Mattermost (Bot API + WebSocket) y más.
+OpenClaw también es la base del asistente de OpenClaw.
 
 <div id="start-here">
   ## Comienza aquí
@@ -45,16 +41,16 @@ OpenClaw también impulsa el asistente OpenClaw.
 
 * **Nueva instalación desde cero:** [Primeros pasos](/es/start/getting-started)
 * **Configuración guiada (recomendada):** [Asistente](/es/start/wizard) (`openclaw onboard`)
-* **Abrir el panel (Gateway local):** http://127.0.0.1:18789/ (o http://localhost:18789/)
+* **Abrir el dashboard (Gateway local):** http://127.0.0.1:18789/ (o http://localhost:18789/)
 
-Si el Gateway se está ejecutando en el mismo equipo, ese enlace abre la Control UI en el navegador de inmediato. Si falla, inicia primero el Gateway: `openclaw gateway`.
+Si el Gateway se está ejecutando en este mismo equipo, ese enlace abre inmediatamente la Control UI en el navegador. Si no funciona, inicia primero el Gateway: `openclaw gateway`.
 
 <div id="dashboard-browser-control-ui">
-  ## Dashboard (Control UI en el navegador)
+  ## Panel de control (Control UI en el navegador)
 </div>
 
-El dashboard es la Control UI en el navegador para chat, configuración, nodos, sesiones y más.
-Acceso local predeterminado: http://127.0.0.1:18789/
+El panel de control es la Control UI en el navegador para chat, configuración, nodos, sesiones y más.
+Predeterminado en local: http://127.0.0.1:18789/
 Acceso remoto: [Interfaces web](/es/web) y [Tailscale](/es/gateway/tailscale)
 
 <p align="center">
@@ -73,7 +69,7 @@ WhatsApp / Telegram / Discord / iMessage (+ plugins)
   │          Gateway          │  ws://127.0.0.1:18789 (loopback-only)
   │     (single source)       │
   │                           │  http://<gateway-host>:18793
-  │                           │    /__openclaw__/canvas/ (host de Canvas)
+  │                           │    /__openclaw__/canvas/ (Canvas host)
   └───────────┬───────────────┘
               │
               ├─ Pi agent (RPC)
@@ -81,7 +77,7 @@ WhatsApp / Telegram / Discord / iMessage (+ plugins)
               ├─ Chat UI (SwiftUI)
               ├─ macOS app (OpenClaw.app)
               ├─ iOS node via Gateway WS + pairing
-              └─ Android node via Gateway WS + pairing
+              └─ nodo Android vía Gateway WS + emparejamiento
 ```
 
 La mayoría de las operaciones pasan a través del **Gateway** (`openclaw gateway`), un único proceso de larga duración que gestiona las conexiones de los canales y el plano de control WebSocket.
@@ -90,42 +86,42 @@ La mayoría de las operaciones pasan a través del **Gateway** (`openclaw gatewa
   ## Modelo de red
 </div>
 
-* **Un Gateway por host (recomendado)**: es el único proceso autorizado para tener la sesión de WhatsApp Web. Si necesitas un bot de rescate o un aislamiento estricto, ejecuta varios gateways con perfiles y puertos aislados; consulta [Múltiples gateways](/es/gateway/multiple-gateways).
-* **Prioridad al loopback**: el WS del Gateway usa por defecto `ws://127.0.0.1:18789`.
+* **Un Gateway por host (recomendado)**: es el único proceso al que se le permite mantener la sesión de WhatsApp Web. Si necesitas un bot de rescate o aislamiento estricto, ejecuta múltiples Gateways con perfiles y puertos aislados; consulta [Múltiples gateways](/es/gateway/multiple-gateways).
+* **Loopback primero**: el WS del Gateway usa por defecto `ws://127.0.0.1:18789`.
   * El asistente ahora genera un token de gateway por defecto (incluso para loopback).
-  * Para acceso vía Tailnet, ejecuta `openclaw gateway --bind tailnet --token ...` (el token es obligatorio para binds que no sean loopback).
-* **Nodos**: se conectan al WebSocket del Gateway (LAN/tailnet/SSH según sea necesario); el puente TCP heredado está obsoleto y eliminado.
-* **Host de Canvas**: servidor de archivos HTTP en `canvasHost.port` (por defecto `18793`), que sirve `/__openclaw__/canvas/` para las WebViews de los nodos; consulta [Configuración del Gateway](/es/gateway/configuration) (`canvasHost`).
+  * Para acceso mediante Tailnet, ejecuta `openclaw gateway --bind tailnet --token ...` (el token es obligatorio para enlaces que no sean de loopback).
+* **Nodos**: se conectan al WebSocket del Gateway (LAN/tailnet/SSH según sea necesario); el puente TCP heredado está obsoleto/eliminado.
+* **Host de Canvas**: servidor de archivos HTTP en `canvasHost.port` (por defecto `18793`), que sirve `/__openclaw__/canvas/` para WebViews del nodo; consulta [Configuración del Gateway](/es/gateway/configuration) (`canvasHost`).
 * **Uso remoto**: túnel SSH o tailnet/VPN; consulta [Acceso remoto](/es/gateway/remote) y [Descubrimiento](/es/gateway/discovery).
 
 <div id="features-high-level">
-  ## Funcionalidades (vista general)
+  ## Funciones (a alto nivel)
 </div>
 
-* 📱 **Integración con WhatsApp** — Usa Baileys para el protocolo de WhatsApp Web
-* ✈️ **Bot de Telegram** — DMs + grupos vía grammY
-* 🎮 **Bot de Discord** — DMs + canales de servidor vía channels.discord.js
+* 📱 **Integración con WhatsApp** — Usa Baileys para el protocolo WhatsApp Web
+* ✈️ **Bot de Telegram** — MD y grupos vía grammY
+* 🎮 **Bot de Discord** — MD y canales de servidores vía channels.discord.js
 * 🧩 **Bot de Mattermost (complemento)** — Token de bot + eventos WebSocket
 * 💬 **iMessage** — Integración local con la CLI `imsg` (macOS)
 * 🤖 **Puente de agente** — Pi (modo RPC) con streaming de herramientas
-* ⏱️ **Streaming + fragmentación** — Streaming por bloques + detalles de streaming de borradores en Telegram ([/concepts/streaming](/es/concepts/streaming))
-* 🧠 **Enrutamiento multiagente** — Enruta cuentas/pares de proveedores a agentes aislados (espacio de trabajo + sesiones por agente)
+* ⏱️ **Streaming + segmentación en bloques** — Detalles de streaming por bloques + streaming de borradores de Telegram ([/concepts/streaming](/es/concepts/streaming))
+* 🧠 **Enrutamiento multiagente** — Redirige cuentas/pares de proveedores a agentes aislados (espacio de trabajo + sesiones por agente)
 * 🔐 **Autenticación por suscripción** — Anthropic (Claude Pro/Max) + OpenAI (ChatGPT/Codex) vía OAuth
-* 💬 **Sesiones** — Los chats directos se agrupan en `main` (predeterminado); los grupos están aislados
-* 👥 **Compatibilidad con chat grupal** — Basado en menciones por defecto; el propietario puede cambiar `/activation always|mention`
+* 💬 **Sesiones** — Los chats directos se combinan en una `main` compartida (predeterminada); los grupos están aislados
+* 👥 **Compatibilidad con chat de grupo** — Basado en menciones de forma predeterminada; el propietario puede alternar `/activation always|mention`
 * 📎 **Compatibilidad con contenido multimedia** — Enviar y recibir imágenes, audio y documentos
-* 🎤 **Notas de voz** — Hook opcional de transcripción
-* 🖥️ **WebChat + app de macOS** — UI local + aplicación en la barra de menús para operaciones y activación por voz
-* 📱 **Nodo iOS** — Se empareja como nodo y expone una superficie Canvas
-* 📱 **Nodo Android** — Se empareja como nodo y expone Canvas + Chat + Cámara
+* 🎤 **Notas de voz** — Hook de transcripción opcional
+* 🖥️ **WebChat + app de macOS** — UI local + app en la barra de menús para operaciones y activación por voz
+* 📱 **Nodo de iOS** — Se empareja como un nodo y expone una superficie de Canvas
+* 📱 **Nodo de Android** — Se empareja como un nodo y expone Canvas + Chat + Cámara
 
-Nota: se han eliminado las rutas heredadas de Claude/Codex/Gemini/Opencode; Pi es la única ruta de agente para código.
+Nota: se han eliminado las rutas heredadas de Claude/Codex/Gemini/Opencode; Pi es la única ruta de agente de programación.
 
 <div id="quick-start">
   ## Inicio rápido
 </div>
 
-Requisito del entorno de ejecución: **Node ≥ 22**.
+Requisito de entorno de ejecución: **Node.js ≥ 22**.
 
 ```bash
 # Recommended: global install (npm/pnpm)
@@ -138,11 +134,11 @@ openclaw onboard --install-daemon
 # Pair WhatsApp Web (shows QR)
 openclaw channels login
 
-# El Gateway se ejecuta como servicio tras la configuración inicial; la ejecución manual sigue siendo posible:
+# Gateway se ejecuta mediante el servicio después de la incorporación; la ejecución manual sigue siendo posible:
 openclaw gateway --port 18789
 ```
 
-Cambiar entre instalaciones de npm y git posteriormente es sencillo: instala la otra variante y ejecuta `openclaw doctor` para actualizar el punto de entrada del servicio Gateway.
+Cambiar más adelante entre instalaciones con npm y con git es sencillo: instala la otra modalidad y ejecuta `openclaw doctor` para actualizar el punto de entrada del servicio Gateway.
 
 Desde el código fuente (desarrollo):
 
@@ -155,9 +151,9 @@ pnpm build
 openclaw onboard --install-daemon
 ```
 
-Si aún no tienes una instalación global, ejecuta el paso de onboarding con `pnpm openclaw ...` desde el repositorio.
+Si aún no tienes una instalación global, ejecuta el paso de configuración inicial mediante `pnpm openclaw ...` desde el repositorio.
 
-Inicio rápido de múltiples instancias (opcional):
+Inicio rápido para varias instancias (opcional):
 
 ```bash
 OPENCLAW_CONFIG_PATH=~/.openclaw/a.json \
@@ -175,10 +171,10 @@ openclaw message send --target +15555550123 --message "Hello from OpenClaw"
   ## Configuración (opcional)
 </div>
 
-La configuración se encuentra en `~/.openclaw/openclaw.json`.
+El archivo de configuración está en `~/.openclaw/openclaw.json`.
 
-* Si **no haces nada**, OpenClaw usa el binario de Pi incluido en modo RPC con sesiones individuales por remitente.
-* Si quieres restringir el acceso, empieza con `channels.whatsapp.allowFrom` y (para grupos) las reglas de menciones.
+* Si **no haces nada**, OpenClaw usa el binario de Pi incluido en modo RPC con sesiones por remitente.
+* Si quieres restringirlo, empieza por `channels.whatsapp.allowFrom` y, para grupos, las reglas de menciones.
 
 Ejemplo:
 
@@ -200,11 +196,11 @@ Ejemplo:
 
 * Empieza aquí:
   * [Hubs de documentación (todas las páginas enlazadas)](/es/start/hubs)
-  * [Ayuda](/es/help) ← *correcciones habituales + resolución de problemas*
+  * [Ayuda](/es/help) ← *correcciones comunes + resolución de problemas*
   * [Configuración](/es/gateway/configuration)
   * [Ejemplos de configuración](/es/gateway/configuration-examples)
   * [Comandos slash](/es/tools/slash-commands)
-  * [Enrutamiento multi-agente](/es/concepts/multi-agent)
+  * [Enrutamiento multiagente](/es/concepts/multi-agent)
   * [Actualización / rollback](/es/install/updating)
   * [Emparejamiento (DM + nodos)](/es/start/pairing)
   * [Modo Nix](/es/install/nix)
@@ -229,7 +225,7 @@ Ejemplo:
   * [Mensajes de grupo de WhatsApp](/es/concepts/group-messages)
   * [Multimedia: imágenes](/es/nodes/images)
   * [Multimedia: audio](/es/nodes/audio)
-* Apps complementarias:
+* Aplicaciones complementarias:
   * [App para macOS](/es/platforms/macos)
   * [App para iOS](/es/platforms/ios)
   * [App para Android](/es/platforms/android)
@@ -247,26 +243,26 @@ Ejemplo:
   ## El nombre
 </div>
 
-**OpenClaw = CLAW + TARDIS** — porque toda langosta espacial necesita una máquina espacio‑tiempo.
+**OpenClaw = CLAW + TARDIS** — porque toda langosta espacial necesita una máquina para viajar en el tiempo y el espacio.
 
 ***
 
-*&quot;Al final, todos estamos jugando con nuestros propios prompts.&quot;* — una IA, probablemente pasada de tokens
+*&quot;En el fondo, todos estamos jugando con nuestros propios prompts.&quot;* — una IA, probablemente colocada de tantos tokens
 
 <div id="credits">
   ## Créditos
 </div>
 
 * **Peter Steinberger** ([@steipete](https://twitter.com/steipete)) — Creador, susurrador de langostas
-* **Mario Zechner** ([@badlogicc](https://twitter.com/badlogicgames)) — Creador de Pi, pentester de seguridad
-* **Clawd** — La langosta espacial que exigió un mejor nombre
+* **Mario Zechner** ([@badlogicc](https://twitter.com/badlogicgames)) — Creador para Pi, especialista en seguridad y pentesting
+* **Clawd** — La langosta espacial que exigió un nombre mejor
 
 <div id="core-contributors">
   ## Colaboradores principales
 </div>
 
 * **Maxim Vovshin** (@Hyaxia, 36747317+Hyaxia@users.noreply.github.com) — skill Blogwatcher
-* **Nacho Iacovino** (@nachoiacovino, nacho.iacovino@gmail.com) — procesamiento de ubicaciones (Telegram + WhatsApp)
+* **Nacho Iacovino** (@nachoiacovino, nacho.iacovino@gmail.com) — procesamiento de ubicaciones (Telegram y WhatsApp)
 
 <div id="license">
   ## Licencia
@@ -276,4 +272,4 @@ MIT — Libre como una langosta en el océano 🦞
 
 ***
 
-*&quot;Al final todos estamos jugando con nuestros propios prompts.&quot;* — Una IA, probablemente colocada a base de tokens
+*&quot;Al final todos estamos jugando con nuestros propios prompts.&quot;* — Una IA, probablemente colocada de tokens

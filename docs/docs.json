@@ -1245,7 +1245,7 @@
             ]
           },
           {
-            "group": "Kernkonzepte",
+            "group": "Grundkonzepte",
             "pages": [
               "de/concepts/architecture",
               "de/concepts/agent",
@@ -1566,7 +1566,7 @@
             ]
           },
           {
-            "group": "Conceptos fundamentales",
+            "group": "Conceptos clave",
             "pages": [
               "es/concepts/architecture",
               "es/concepts/agent",
@@ -1729,7 +1729,7 @@
             ]
           },
           {
-            "group": "Nodos y dispositivos",
+            "group": "Nodos y multimedia",
             "pages": [
               "es/nodes",
               "es/nodes/camera",
@@ -1806,7 +1806,7 @@
       {
         "groups": [
           {
-            "group": "Bien démarrer",
+            "group": "Prise en main",
             "pages": [
               "fr/index",
               "fr/start/getting-started",
@@ -2022,7 +2022,7 @@
             ]
           },
           {
-            "group": "Outils & compétences",
+            "group": "Outils et compétences",
             "pages": [
               "fr/tools",
               "fr/tools/lobster",
@@ -2050,7 +2050,7 @@
             ]
           },
           {
-            "group": "Nœuds & médias",
+            "group": "Nœuds et médias",
             "pages": [
               "fr/nodes",
               "fr/nodes/camera",
@@ -2101,7 +2101,7 @@
             ]
           },
           {
-            "group": "Référence & modèles",
+            "group": "Référence et modèles",
             "pages": [
               "fr/testing",
               "fr/scripts",
@@ -2279,7 +2279,7 @@
             ]
           },
           {
-            "group": "Web とインターフェース",
+            "group": "Web とインターフェイス",
             "pages": [
               "ja/web",
               "ja/web/control-ui",
@@ -2399,7 +2399,7 @@
             ]
           },
           {
-            "group": "macOS用コンパニオンアプリ",
+            "group": "macOS コンパニオンアプリ",
             "pages": [
               "ja/platforms/mac/dev-setup",
               "ja/platforms/mac/menu-bar",
@@ -2565,7 +2565,7 @@
             ]
           },
           {
-            "group": "Gateway 与运维管理",
+            "group": "Gateway 与运维",
             "pages": [
               "zh/gateway",
               "zh/gateway/protocol",
@@ -2600,7 +2600,7 @@
             ]
           },
           {
-            "group": "Web 与用户界面",
+            "group": "Web 与 UI",
             "pages": [
               "zh/web",
               "zh/web/control-ui",
@@ -2651,7 +2651,7 @@
             ]
           },
           {
-            "group": "自动化与钩子",
+            "group": "自动化与 Hook",
             "pages": [
               "zh/hooks",
               "zh/hooks/soul-evil",
