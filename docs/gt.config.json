@@ -32,6 +32,9 @@
         }
       }
     },
+    "skipFileValidation": {
+      "mdx": true
+    },
     "docsUrlPattern": "/[locale]",
     "docsImportPattern": "/snippets/[locale]",
     "generateRedirects": "./docs.json",
