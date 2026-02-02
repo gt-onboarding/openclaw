@@ -1,0 +1,121 @@
+---
+title: Distribuisci su Railway
+---
+
+Distribuisci OpenClaw su Railway con un modello preconfigurato “one-click” e completa la configurazione nel browser.
+Questo è il percorso più semplice, “senza terminale sul server”: Railway esegue il Gateway per te
+e tu configuri tutto tramite la procedura guidata web `/setup`.
+
+<div id="quick-checklist-new-users">
+  ## Checklist rapida (nuovi utenti)
+</div>
+
+1) Clicca su **Deploy on Railway** (qui sotto).
+2) Aggiungi un **Volume** montato su `/data`.
+3) Imposta le **variabili** richieste (almeno `SETUP_PASSWORD`).
+4) Abilita il **proxy HTTP** sulla porta `8080`.
+5) Apri `https://<your-railway-domain>/setup` e completa la procedura guidata.
+
+<div id="one-click-deploy">
+  ## Deploy con un clic
+</div>
+
+<a href="https://railway.com/deploy/clawdbot-railway-template" target="_blank" rel="noreferrer">Effettua il deploy su Railway</a>
+
+Dopo il deploy, individua il tuo URL pubblico in **Railway → il tuo servizio → Settings → Domains**.
+
+Railway:
+
+- ti fornirà un dominio generato (spesso `https://<something>.up.railway.app`), oppure
+- userà il tuo dominio personalizzato se ne hai collegato uno.
+
+Quindi apri:
+
+- `https://<your-railway-domain>/setup` — procedura guidata di configurazione (protetta da password)
+- `https://<your-railway-domain>/openclaw` — Control UI
+
+<div id="what-you-get">
+  ## Cosa ottieni
+</div>
+
+- Gateway OpenClaw ospitato + Control UI
+- Procedura guidata di configurazione web su `/setup` (nessun comando da terminale necessario)
+- Archiviazione persistente tramite Railway Volume (`/data`), così che config/credenziali/spazio di lavoro sopravvivano ai redeploy
+- Esportazione di backup su `/setup/export` per migrare da Railway in un secondo momento
+
+<div id="required-railway-settings">
+  ## Impostazioni richieste per Railway
+</div>
+
+<div id="public-networking">
+  ### Rete pubblica
+</div>
+
+Abilita il **proxy HTTP** per il servizio.
+
+- Porta: `8080`
+
+<div id="volume-required">
+  ### Volume (obbligatorio)
+</div>
+
+Collega un volume montato in:
+
+- `/data`
+
+<div id="variables">
+  ### Variabili
+</div>
+
+Imposta queste variabili nel servizio:
+
+- `SETUP_PASSWORD` (obbligatorio)
+- `PORT=8080` (obbligatorio — deve corrispondere alla porta in Public Networking)
+- `OPENCLAW_STATE_DIR=/data/.openclaw` (consigliato)
+- `OPENCLAW_WORKSPACE_DIR=/data/workspace` (consigliato)
+- `OPENCLAW_GATEWAY_TOKEN` (consigliato; trattalo come un segreto di amministrazione)
+
+<div id="setup-flow">
+  ## Flusso di configurazione
+</div>
+
+1) Vai all'indirizzo `https://<your-railway-domain>/setup` e inserisci la tua `SETUP_PASSWORD`.
+2) Scegli un modello/un provider di autenticazione e incolla la tua chiave (ad es. la chiave API).
+3) (Opzionale) Aggiungi i token di Telegram/Discord/Slack.
+4) Fai clic su **Run setup**.
+
+Se i DM di Telegram sono impostati sulla modalità di abbinamento, la procedura guidata di configurazione può approvare il codice di abbinamento.
+
+<div id="getting-chat-tokens">
+  ## Recuperare i token di chat
+</div>
+
+<div id="telegram-bot-token">
+  ### Token del bot Telegram
+</div>
+
+1) Invia un messaggio a `@BotFather` su Telegram
+2) Esegui il comando `/newbot`
+3) Copia il token (nel formato `123456789:AA...`)
+4) Incollalo in `/setup`
+
+<div id="discord-bot-token">
+  ### Token del bot Discord
+</div>
+
+1) Vai all'indirizzo https://discord.com/developers/applications
+2) **New Application** → scegli un nome
+3) **Bot** → **Add Bot**
+4) **Enable MESSAGE CONTENT INTENT** nella sezione Bot → Privileged Gateway Intents (obbligatorio, altrimenti il bot andrà in crash all'avvio)
+5) Copia il **Bot Token** e incollalo in `/setup`
+6) Invita il bot sul tuo server (OAuth2 URL Generator; scope: `bot`, `applications.commands`)
+
+<div id="backups-migration">
+  ## Backup e migrazione
+</div>
+
+Scarica un backup all'indirizzo:
+
+- `https://<your-railway-domain>/setup/export`
+
+Questo esporta lo stato di OpenClaw e lo spazio di lavoro, così puoi migrare a un altro host senza perdere configurazioni o memoria.

@@ -51,7 +51,8 @@
     "ja",
     "zh",
     "fr",
-    "de"
+    "de",
+    "it"
   ],
   "defaultLocale": "en",
   "$schema": "https://assets.gtx.dev/config-schema.json",
