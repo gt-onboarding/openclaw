@@ -1,0 +1,65 @@
+---
+title: 在 Northflank 上部署
+---
+
+使用一键模板在 Northflank 上部署 OpenClaw，并在浏览器中完成设置。
+这是最简单的“服务器端无需使用终端”的方案：Northflank 会为你运行 Gateway，
+你只需通过 `/setup` 网页向导完成所有配置。
+
+<div id="how-to-get-started">
+  ## 如何开始
+</div>
+
+1. 点击 [Deploy OpenClaw](https://northflank.com/stacks/deploy-openclaw) 打开模板。  
+2. 如果你还没有 Northflank 账户，请先[在 Northflank 上创建账户](https://app.northflank.com/signup)。  
+3. 点击 **Deploy OpenClaw now**。  
+4. 设置必需的环境变量：`SETUP_PASSWORD`。
+5. 点击 **Deploy stack**，以构建并运行 OpenClaw 模板。
+6. 等待部署完成，然后点击 **View resources**。
+7. 打开 OpenClaw 服务。
+8. 打开对外可访问的 OpenClaw URL，并在 `/setup` 完成初始化配置。
+9. 在 `/openclaw` 打开 Control UI。
+
+<div id="what-you-get">
+  ## 你将获得
+</div>
+
+- 托管的 OpenClaw Gateway + Control UI
+- `/setup` 路径下的网页引导式设置向导（无需在终端中输入命令）
+- 通过 Northflank Volume（`/data`）提供持久化存储，确保配置/凭据/工作区在重新部署后仍然保留
+
+<div id="setup-flow">
+  ## 设置流程
+</div>
+
+1) 访问 `https://<your-northflank-domain>/setup` 并输入你的 `SETUP_PASSWORD`。
+2) 选择一个模型/认证提供方并粘贴你的密钥。
+3) (可选) 添加 Telegram/Discord/Slack 令牌。
+4) 点击 **Run setup**。
+5) 在 `https://<your-northflank-domain>/openclaw` 打开 Control UI。
+
+如果 Telegram 私信设置为配对模式,设置向导可以批准配对码。
+
+<div id="getting-chat-tokens">
+  ## 获取聊天 Token
+</div>
+
+<div id="telegram-bot-token">
+  ### Telegram 机器人令牌
+</div>
+
+1) 在 Telegram 中给 `@BotFather` 发送消息
+2) 发送命令 `/newbot`
+3) 复制令牌（形如 `123456789:AA...`）
+4) 将其粘贴到 `/setup` 中
+
+<div id="discord-bot-token">
+  ### Discord 机器人 token
+</div>
+
+1) 访问 https://discord.com/developers/applications
+2) 点击 **New Application** → 选择一个名称
+3) 进入 **Bot** → **Add Bot**
+4) 在 Bot → Privileged Gateway Intents 下启用 **MESSAGE CONTENT INTENT**（必需，否则机器人在启动时会崩溃）
+5) 复制 **Bot Token** 并粘贴到 `/setup` 中
+6) 邀请机器人加入你的服务器（使用 OAuth2 URL Generator；scopes: `bot`、`applications.commands`）

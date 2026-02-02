@@ -1,0 +1,65 @@
+---
+title: Auf Northflank bereitstellen
+---
+
+Stelle OpenClaw auf Northflank mit einer One-Click-Vorlage bereit und schließe die Einrichtung in deinem Browser ab.
+Das ist der einfachste Weg ganz ohne Terminal-Zugriff auf dem Server: Northflank betreibt das Gateway für dich
+und du nimmst die gesamte Konfiguration über den `/setup`-Webassistenten vor.
+
+<div id="how-to-get-started">
+  ## Erste Schritte
+</div>
+
+1. Klicke auf [Deploy OpenClaw](https://northflank.com/stacks/deploy-openclaw), um das Template zu öffnen.  
+2. Erstelle ein [Konto bei Northflank](https://app.northflank.com/signup), falls du noch keines hast.  
+3. Klicke auf **Deploy OpenClaw now**.  
+4. Setze die erforderliche Umgebungsvariable: `SETUP_PASSWORD`.
+5. Klicke auf **Deploy stack**, um das OpenClaw-Template zu erstellen und auszuführen.
+6. Warte, bis die Bereitstellung abgeschlossen ist, und klicke dann auf **View resources**.
+7. Öffne den OpenClaw-Service.
+8. Öffne die öffentliche OpenClaw-URL und schließe die Einrichtung unter `/setup` ab.
+9. Öffne die Control UI unter `/openclaw`.
+
+<div id="what-you-get">
+  ## Was Sie erhalten
+</div>
+
+- Gehosteter OpenClaw-Gateway + Control UI
+- Web-Setup-Assistent unter `/setup` (keine Terminalbefehle)
+- Persistenter Speicher über ein Northflank-Volume (`/data`), sodass Konfiguration, Anmeldedaten und Arbeitsbereich Neubereitstellungen überstehen
+
+<div id="setup-flow">
+  ## Setup-Ablauf
+</div>
+
+1) Rufe `https://<your-northflank-domain>/setup` auf und gib dein `SETUP_PASSWORD` ein.
+2) Wähle einen Modell-/Auth-Anbieter und füge deinen Schlüssel ein.
+3) (Optional) Füge Telegram-/Discord-/Slack-Tokens hinzu.
+4) Klicke auf **Run setup**.
+5) Öffne die Control UI unter `https://<your-northflank-domain>/openclaw`
+
+Wenn Telegram-DMs auf Kopplung gestellt sind, kann der Setup-Assistent den Kopplungscode bestätigen.
+
+<div id="getting-chat-tokens">
+  ## Chat-Tokens erhalten
+</div>
+
+<div id="telegram-bot-token">
+  ### Telegram-Bot-Token
+</div>
+
+1) Sende eine Nachricht an `@BotFather` in Telegram
+2) Führe `/newbot` aus
+3) Kopiere den Token (sieht etwa so aus: `123456789:AA...`)
+4) Füge ihn in `/setup` ein
+
+<div id="discord-bot-token">
+  ### Discord-Bot-Token
+</div>
+
+1) Rufe https://discord.com/developers/applications auf
+2) **New Application** → wähle einen Namen aus
+3) **Bot** → **Add Bot**
+4) Aktiviere **MESSAGE CONTENT INTENT** unter Bot → Privileged Gateway Intents (erforderlich, sonst stürzt der Bot beim Start ab)
+5) Kopiere den **Bot-Token** und füge ihn in `/setup` ein
+6) Lade den Bot auf deinen Server ein (OAuth2 URL Generator; scopes: `bot`, `applications.commands`)
